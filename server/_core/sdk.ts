@@ -1,4 +1,4 @@
-import { COOKIE_NAME } from "@shared/const";
+import { COOKIE_NAME } from "../../shared/const";
 import { parse as parseCookieHeader } from "cookie";
 import type { Request } from "express";
 import { SignJWT, jwtVerify } from "jose";
@@ -53,7 +53,8 @@ class SessionService {
   }
 
   getSessionCookie(req: Request): string | undefined {
-    return this.parseCookies(req.headers.cookie).get(COOKIE_NAME);
+    const cookieHeader = (req as any).headers?.cookie;
+    return this.parseCookies(cookieHeader).get(COOKIE_NAME);
   }
 }
 
