@@ -1,0 +1,25 @@
+{
+  "buildCommand": "pnpm build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/dist/index.js"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/dist/index.html"
+    }
+  ],
+  "functions": {
+    "server/_core/index.ts": {
+      "runtime": "nodejs20.x",
+      "memory": 512,
+      "maxDuration": 60
+    }
+  },
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
