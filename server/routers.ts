@@ -3,8 +3,9 @@ import { TRPCError } from "@trpc/server";
 import { publicProcedure, router } from "./_core/trpc";
 import * as db from "./db";
 import * as crypto from "crypto";
-import { COOKIE_NAME } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
+import { sdk } from "./_core/sdk";
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -55,11 +56,11 @@ const authRouter = router({
         throw new TRPCError({ code: "FORBIDDEN", message: "User account is inactive" });
       }
 
-      // Update last signed in
-      await db.updateAgent(user.id, {});
+      // Create JWT session token and set cookie
+      const sessionToken = await sdk.createSessionToken(user.username, user.name || "");
+      const cookieOptions = getSessionCookieOptions(ctx.req);
+      ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
 
-      // In a real app, you'd create a session token here
-      // For now, we'll rely on the existing session management
       return {
         success: true,
         user: {
@@ -343,7 +344,6 @@ const callbackQueueRouter = router({
   markCompleted: protectedAgentProcedure
     .input(z.object({ callbackId: z.number() }))
     .mutation(async ({ input, ctx }) => {
-      // Verify the callback belongs to the agent
       const entries = await db.getCallbackQueueByAgent(ctx.user.id, true);
       const entry = entries.find((e) => e.id === input.callbackId);
 
@@ -365,7 +365,6 @@ const callbackQueueRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      // Verify the callback belongs to the agent
       const entries = await db.getCallbackQueueByAgent(ctx.user.id, true);
       const entry = entries.find((e) => e.id === input.callbackId);
 
