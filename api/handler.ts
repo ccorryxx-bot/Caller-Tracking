@@ -1,30 +1,39 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import express from "express";
-import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { registerOAuthRoutes } from "../server/_core/oauth";
-import { registerStorageProxy } from "../server/_core/storageProxy";
-import { appRouter } from "../server/routers";
-import { createContext } from "../server/_core/context";
 
-// Catch top-level initialization errors
-let appInstance: ReturnType<typeof express> | null = null;
-let initErr: string | null = null;
+let app: any = null;
+let initErr: any = null;
 
-try {
-  const app = express();
-  app.use(express.json({ limit: "50mb" }));
-  app.use(express.urlencoded({ limit: "50mb", extended: true }));
-  registerStorageProxy(app);
-  registerOAuthRoutes(app);
-  app.use("/api/trpc", createExpressMiddleware({ router: appRouter, createContext }));
-  appInstance = app;
-} catch (e: any) {
-  initErr = String(e) + "\n" + (e?.stack || "");
+function init() {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const express = require("express");
+    const { createExpressMiddleware } = require("@trpc/server/adapters/express");
+    const { registerOAuthRoutes } = require("../server/_core/oauth");
+    const { registerStorageProxy } = require("../server/_core/storageProxy");
+    const { appRouter } = require("../server/routers");
+    const { createContext } = require("../server/_core/context");
+
+    const a = express();
+    a.use(express.json({ limit: "50mb" }));
+    a.use(express.urlencoded({ limit: "50mb", extended: true }));
+    registerStorageProxy(a);
+    registerOAuthRoutes(a);
+    a.use("/api/trpc", createExpressMiddleware({ router: appRouter, createContext }));
+    app = a;
+  } catch (e: any) {
+    initErr = e;
+  }
 }
 
+init();
+
 export default (req: VercelRequest, res: VercelResponse) => {
-  if (initErr || !appInstance) {
-    return res.status(500).json({ initError: initErr, ok: false });
+  if (initErr || !app) {
+    return res.status(500).json({
+      error: "init failed",
+      message: String(initErr),
+      stack: initErr?.stack?.slice(0, 3000),
+    });
   }
-  (appInstance as any)(req, res);
+  app(req, res);
 };
