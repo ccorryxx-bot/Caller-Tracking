@@ -1,22 +1,10 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-import express from "express";
-import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { registerOAuthRoutes } from "../server/_core/oauth";
-import { registerStorageProxy } from "../server/_core/storageProxy";
-import { appRouter } from "../server/routers";
-import { createContext } from "../server/_core/context";
-
-// Create Express app — static files are served by Vercel CDN
-const app = express();
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ limit: "50mb", extended: true }));
-registerStorageProxy(app);
-registerOAuthRoutes(app);
-app.use(
-  "/api/trpc",
-  createExpressMiddleware({ router: appRouter, createContext })
-);
-
-export default (req: VercelRequest, res: VercelResponse) => {
-  app(req, res);
+export default (req: any, res: any) => {
+  res.json({
+    ok: true,
+    node: process.version,
+    vercel: process.env.VERCEL ?? "not set",
+    env: process.env.NODE_ENV,
+    method: req.method,
+    url: req.url,
+  });
 };
