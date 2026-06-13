@@ -7,8 +7,9 @@ import { toast } from "sonner";
 import AgentManagement from "@/components/admin/AgentManagement";
 import PhoneNumberManagement from "@/components/admin/PhoneNumberManagement";
 import SystemOverview from "@/components/admin/SystemOverview";
+import StatisticsDashboard from "@/components/admin/StatisticsDashboard";
 
-type AdminTab = "overview" | "agents" | "phone-numbers";
+type AdminTab = "overview" | "agents" | "phone-numbers" | "statistics";
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
@@ -70,6 +71,16 @@ export default function AdminDashboard() {
             >
               Phone Numbers
             </button>
+            <button
+              onClick={() => setActiveTab("statistics")}
+              className={`w-full text-left px-4 py-2 rounded text-sm font-medium transition-colors ${
+                activeTab === "statistics"
+                  ? "bg-white text-gray-900 border border-gray-200"
+                  : "text-gray-700 hover:bg-white hover:border hover:border-gray-200"
+              }`}
+            >
+              Statistics
+            </button>
           </nav>
         </aside>
 
@@ -78,6 +89,7 @@ export default function AdminDashboard() {
           {activeTab === "overview" && <SystemOverview />}
           {activeTab === "agents" && <AgentManagement />}
           {activeTab === "phone-numbers" && <PhoneNumberManagement />}
+          {activeTab === "statistics" && <StatisticsDashboard />}
         </main>
       </div>
     </div>

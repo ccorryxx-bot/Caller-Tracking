@@ -7,6 +7,7 @@ import CallLogEntry from "@/components/agent/CallLogEntry";
 import CallLogList from "@/components/agent/CallLogList";
 import CallbackQueueEntry from "@/components/agent/CallbackQueueEntry";
 import CallbackQueueList from "@/components/agent/CallbackQueueList";
+import AgentStatistics from "./AgentStatistics";
 
 export default function AgentDashboard() {
   const { user, logout } = useAuth();
@@ -43,6 +44,9 @@ export default function AgentDashboard() {
             <TabsTrigger value="callbacks" className="rounded-none border-b-2 border-transparent data-[state=active]:border-gray-900 data-[state=active]:bg-transparent">
               Callback Queue
             </TabsTrigger>
+            <TabsTrigger value="statistics" className="rounded-none border-b-2 border-transparent data-[state=active]:border-gray-900 data-[state=active]:bg-transparent">
+              Statistics
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="call-logs" className="mt-8 space-y-8">
@@ -65,6 +69,10 @@ export default function AgentDashboard() {
                 <CallbackQueueList />
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="statistics" className="mt-8">
+            <AgentStatistics />
           </TabsContent>
         </Tabs>
       </main>
