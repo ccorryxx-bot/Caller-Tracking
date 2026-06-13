@@ -29,10 +29,13 @@ export function registerOAuthRoutes(app: Express) {
       }
 
       await db.upsertUser({
+        username: userInfo.openId,
+        passwordHash: '', // OAuth users don't have passwords
         openId: userInfo.openId,
         name: userInfo.name || null,
         email: userInfo.email ?? null,
-        loginMethod: userInfo.loginMethod ?? userInfo.platform ?? null,
+        role: 'admin', // OAuth users are admins by default
+        isActive: true,
         lastSignedIn: new Date(),
       });
 

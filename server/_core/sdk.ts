@@ -277,20 +277,23 @@ class SDKServer {
 
     const sessionUserId = session.openId;
     const signedInAt = new Date();
-    let user = await db.getUserByOpenId(sessionUserId);
+    let user = await db.getUserByUsername(sessionUserId);
 
     // If user not in DB, sync from OAuth server automatically
     if (!user) {
       try {
         const userInfo = await this.getUserInfoWithJwt(sessionCookie ?? "");
         await db.upsertUser({
+          username: userInfo.openId,
+          passwordHash: '', // OAuth users don't have passwords
           openId: userInfo.openId,
           name: userInfo.name || null,
           email: userInfo.email ?? null,
-          loginMethod: userInfo.loginMethod ?? userInfo.platform ?? null,
+          role: 'admin', // OAuth users are admins by default
+          isActive: true,
           lastSignedIn: signedInAt,
         });
-        user = await db.getUserByOpenId(userInfo.openId);
+        user = await db.getUserByUsername(userInfo.openId);
       } catch (error) {
         console.error("[Auth] Failed to sync user from OAuth:", error);
         throw ForbiddenError("Failed to sync user info");
@@ -301,10 +304,22 @@ class SDKServer {
       throw ForbiddenError("User not found");
     }
 
-    await db.upsertUser({
-      openId: user.openId,
-      lastSignedIn: signedInAt,
-    });
+    // For OAuth users, create a username from openId if not exists
+    if (user.openId) {
+      const existingUser = await db.getUserByUsername(user.openId);
+      if (!existingUser) {
+        await db.upsertUser({
+          username: user.openId,
+          passwordHash: '', // OAuth users don't have passwords
+          openId: user.openId,
+          name: user.name || null,
+          email: user.email || null,
+          role: 'admin', // OAuth users are admins by default
+          isActive: true,
+          lastSignedIn: signedInAt,
+        });
+      }
+    }
 
     return user;
   }
@@ -325,10 +340,12 @@ function buildCronUser(
   return {
     id: -1,
     openId: userInfo.openId,
+    username: userInfo.openId,
+    passwordHash: '',
     name: userInfo.name || "Manus Scheduled Task",
     email: null,
-    loginMethod: null,
-    role: "user",
+    role: "admin",
+    isActive: true,
     createdAt: now,
     updatedAt: now,
     lastSignedIn: now,
