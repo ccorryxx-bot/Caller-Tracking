@@ -1,44 +1,23 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-
-let app: any = null;
-let initError: any = null;
-
-async function initApp() {
+export default async (req: any, res: any) => {
+  const steps: string[] = [];
   try {
+    steps.push("1: start");
     const express = (await import("express")).default;
+    steps.push("2: express ok");
     const { createExpressMiddleware } = await import("@trpc/server/adapters/express");
+    steps.push("3: trpc-express ok");
     const { registerOAuthRoutes } = await import("../server/_core/oauth");
+    steps.push("4: oauth ok");
     const { registerStorageProxy } = await import("../server/_core/storageProxy");
-    const { appRouter } = await import("../server/routers");
+    steps.push("5: storageProxy ok");
+    const { sdk } = await import("../server/_core/sdk");
+    steps.push("6: sdk ok");
     const { createContext } = await import("../server/_core/context");
-
-    const a = express();
-    a.use(express.json({ limit: "50mb" }));
-    a.use(express.urlencoded({ limit: "50mb", extended: true }));
-    registerStorageProxy(a);
-    registerOAuthRoutes(a);
-    a.use("/api/trpc", createExpressMiddleware({ router: appRouter, createContext }));
-    return a;
-  } catch (err) {
-    initError = err;
-    throw err;
-  }
-}
-
-const appPromise = initApp();
-
-export default async (req: VercelRequest, res: VercelResponse) => {
-  if (initError) {
-    return res.status(500).json({
-      error: "Init failed",
-      message: String(initError),
-      stack: initError?.stack?.slice(0, 2000),
-    });
-  }
-  try {
-    const a = await appPromise;
-    a(req, res);
+    steps.push("7: context ok");
+    const { appRouter } = await import("../server/routers");
+    steps.push("8: routers ok");
+    res.json({ ok: true, steps });
   } catch (err: any) {
-    res.status(500).json({ error: "Handler failed", message: String(err), stack: err?.stack?.slice(0, 2000) });
+    res.status(500).json({ ok: false, steps, error: String(err), stack: err?.stack?.slice(0, 3000) });
   }
 };
