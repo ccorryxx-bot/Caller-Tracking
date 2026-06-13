@@ -6,7 +6,9 @@
     "NODE_ENV": "production"
   },
   "functions": {
-    "api/handler.ts": {}
+    "api/handler.ts": {
+      "maxDuration": 30
+    }
   },
   "routes": [
     {
