@@ -37,14 +37,14 @@ function buildApp() {
   return app;
 }
 
-// Exported for Vercel serverless handler
+// Exported for Vercel serverless handler — does NOT start an HTTP server
 export async function createServer() {
   const app = buildApp();
   serveStatic(app as any);
   return app;
 }
 
-async function startServer() {
+async function startStandaloneServer() {
   const app = buildApp();
   const server = createHttpServer(app);
 
@@ -57,10 +57,10 @@ async function startServer() {
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);
   if (port !== preferredPort) console.log("Port " + preferredPort + " busy, using " + port);
-
-  server.listen(port, () => {
-    console.log("Server running on http://localhost:" + port + "/");
-  });
+  server.listen(port, () => console.log("Server running on http://localhost:" + port + "/"));
 }
 
-startServer().catch(console.error);
+// Only auto-start when NOT running inside Vercel serverless
+if (!process.env.VERCEL) {
+  startStandaloneServer().catch(console.error);
+}
