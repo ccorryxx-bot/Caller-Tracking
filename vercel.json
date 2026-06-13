@@ -23,6 +23,9 @@
       "dest": "/api/handler.ts"
     },
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
