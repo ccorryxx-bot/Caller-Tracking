@@ -1,8 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "pnpm install && pnpm build",
-  "outputDirectory": "dist",
-  "framework": "vite",
+  "buildCommand": "pnpm install && pnpm exec vite build",
+  "outputDirectory": "dist/public",
   "env": {
     "NODE_ENV": "production"
   },
@@ -14,7 +13,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/dist/index.html"
+      "dest": "/index.html"
     }
   ]
 }
