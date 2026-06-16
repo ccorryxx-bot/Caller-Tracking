@@ -443,8 +443,9 @@ Deno.serve(async (req: Request) => {
   }
 
   const url = new URL(req.url);
-  // Strip /functions/v1/api prefix to get the route path
-  const path = url.pathname.replace(/^\/functions\/v1\/api/, "") || "/";
+  // Supabase strips /functions/v1 before handing to the function,
+  // so pathname arrives as /api/... — strip /api to get the route path.
+  const path = url.pathname.replace(/^\/api/, "") || "/";
   const method = req.method.toUpperCase();
 
   // ── Health ──
