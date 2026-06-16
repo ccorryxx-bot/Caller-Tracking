@@ -1,6 +1,5 @@
 {
-  "buildCommand": "pnpm --filter @workspace/api-server run build && pnpm --filter @workspace/web run build",
-  "outputDirectory": "artifacts/web/dist/public",
+  "buildCommand": "bash build-vercel.sh",
   "installCommand": "pnpm install",
   "framework": null,
   "rewrites": [
