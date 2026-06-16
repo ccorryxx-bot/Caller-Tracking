@@ -31,6 +31,7 @@ import type {
   CallLog,
   CurrentUser,
   ErrorResponse,
+  GetNextNumberParams,
   HealthStatus,
   LoginInput,
   LoginResult,
@@ -349,20 +350,27 @@ export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = Err
 
 
 
-export const getGetNextNumberUrl = () => {
+export const getGetNextNumberUrl = (params?: GetNextNumberParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/api/agent/next-number`
+  return stringifiedParams.length > 0 ? `/api/agent/next-number?${stringifiedParams}` : `/api/agent/next-number`
 }
 
 /**
- * @summary Get next uncalled phone number for agent
+ * @summary Get next uncalled phone number(s) for agent
  */
-export const getNextNumber = async ( options?: RequestInit): Promise<NextNumberResult> => {
+export const getNextNumber = async (params?: GetNextNumberParams, options?: RequestInit): Promise<NextNumberResult> => {
 
-  return customFetch<NextNumberResult>(getGetNextNumberUrl(),
+  return customFetch<NextNumberResult>(getGetNextNumberUrl(params),
   {
     ...options,
     method: 'GET'
@@ -375,23 +383,23 @@ export const getNextNumber = async ( options?: RequestInit): Promise<NextNumberR
 
 
 
-export const getGetNextNumberQueryKey = () => {
+export const getGetNextNumberQueryKey = (params?: GetNextNumberParams,) => {
     return [
-    `/api/agent/next-number`
+    `/api/agent/next-number`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getGetNextNumberQueryOptions = <TData = Awaited<ReturnType<typeof getNextNumber>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getNextNumber>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getGetNextNumberQueryOptions = <TData = Awaited<ReturnType<typeof getNextNumber>>, TError = ErrorType<ErrorResponse>>(params?: GetNextNumberParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getNextNumber>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetNextNumberQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetNextNumberQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getNextNumber>>> = ({ signal }) => getNextNumber({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getNextNumber>>> = ({ signal }) => getNextNumber(params, { signal, ...requestOptions });
 
 
 
@@ -405,15 +413,15 @@ export type GetNextNumberQueryError = ErrorType<ErrorResponse>
 
 
 /**
- * @summary Get next uncalled phone number for agent
+ * @summary Get next uncalled phone number(s) for agent
  */
 
 export function useGetNextNumber<TData = Awaited<ReturnType<typeof getNextNumber>>, TError = ErrorType<ErrorResponse>>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getNextNumber>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+ params?: GetNextNumberParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getNextNumber>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getGetNextNumberQueryOptions(options)
+  const queryOptions = getGetNextNumberQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

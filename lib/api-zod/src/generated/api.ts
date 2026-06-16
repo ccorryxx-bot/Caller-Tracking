@@ -57,14 +57,27 @@ export const GetMeResponse = zod.object({
 
 
 /**
- * @summary Get next uncalled phone number for agent
+ * @summary Get next uncalled phone number(s) for agent
  */
+export const getNextNumberQueryLimitDefault = 1;
+export const getNextNumberQueryLimitMax = 10;
+
+
+
+export const GetNextNumberQueryParams = zod.object({
+  "limit": zod.coerce.number().min(1).max(getNextNumberQueryLimitMax).default(getNextNumberQueryLimitDefault).describe('Number of phone numbers to prefetch (default 1)')
+})
+
 export const GetNextNumberResponse = zod.object({
   "done": zod.boolean(),
   "phoneNumber": zod.string().nullish(),
   "phoneNumberId": zod.number().nullish(),
   "remaining": zod.number().nullish(),
-  "total": zod.number().nullish()
+  "total": zod.number().nullish(),
+  "queue": zod.array(zod.object({
+  "phoneNumber": zod.string(),
+  "phoneNumberId": zod.number()
+})).optional().describe('Pre-fetched next numbers (when limit > 1)')
 })
 
 

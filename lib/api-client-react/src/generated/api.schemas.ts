@@ -45,6 +45,11 @@ export interface LoginResult {
   user: CurrentUser;
 }
 
+export interface QueueItem {
+  phoneNumber: string;
+  phoneNumberId: number;
+}
+
 export interface NextNumberResult {
   done: boolean;
   /** @nullable */
@@ -55,6 +60,8 @@ export interface NextNumberResult {
   remaining?: number | null;
   /** @nullable */
   total?: number | null;
+  /** Pre-fetched next numbers (when limit > 1) */
+  queue?: QueueItem[];
 }
 
 export type CallInputOutcome = typeof CallInputOutcome[keyof typeof CallInputOutcome];
@@ -195,4 +202,13 @@ export interface AgentDetailResult {
   agent: AgentUser;
   calls: CallLogDetail[];
 }
+
+export type GetNextNumberParams = {
+/**
+ * Number of phone numbers to prefetch (default 1)
+ * @minimum 1
+ * @maximum 10
+ */
+limit?: number;
+};
 

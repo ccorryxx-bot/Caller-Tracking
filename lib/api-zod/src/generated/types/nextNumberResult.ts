@@ -5,6 +5,7 @@
  * Caller Tracking System API
  * OpenAPI spec version: 0.1.0
  */
+import type { QueueItem } from './queueItem';
 
 export interface NextNumberResult {
   done: boolean;
@@ -16,4 +17,6 @@ export interface NextNumberResult {
   remaining?: number | null;
   /** @nullable */
   total?: number | null;
+  /** Pre-fetched next numbers (when limit > 1) */
+  queue?: QueueItem[];
 }

@@ -91,7 +91,17 @@ paths:
     get:
       operationId: getNextNumber
       tags: [agent]
-      summary: Get next uncalled phone number for agent
+      summary: Get next uncalled phone number(s) for agent
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+            maximum: 10
+          description: Number of phone numbers to prefetch (default 1)
       responses:
         "200":
           description: Next phone number or null if none left
@@ -441,6 +451,15 @@ components:
           type: string
           enum: [agent, admin]
 
+    QueueItem:
+      type: object
+      required: [phoneNumber, phoneNumberId]
+      properties:
+        phoneNumber:
+          type: string
+        phoneNumberId:
+          type: integer
+
     NextNumberResult:
       type: object
       required: [done]
@@ -455,6 +474,11 @@ components:
           type: ["integer", "null"]
         total:
           type: ["integer", "null"]
+        queue:
+          type: array
+          items:
+            $ref: "#/components/schemas/QueueItem"
+          description: Pre-fetched next numbers (when limit > 1)
 
     CallInput:
       type: object
