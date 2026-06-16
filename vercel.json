@@ -1,9 +1,5 @@
 {
   "buildCommand": "bash build-vercel.sh",
-  "outputDirectory": "dist",
   "installCommand": "pnpm install",
-  "framework": null,
-  "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
-  ]
+  "framework": null
 }
