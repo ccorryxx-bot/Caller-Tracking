@@ -360,7 +360,13 @@ export async function customFetch<T = unknown>(
 
   const requestInfo = { method, url: resolveUrl(input) };
 
-  const response = await fetch(input, { ...init, method, headers });
+  // Include credentials (cookies) for cross-origin requests when a base URL
+  // is configured pointing to an absolute origin (e.g. Supabase Edge Functions).
+  const resolvedUrl = resolveUrl(applyBaseUrl(input));
+  const isCrossOrigin = resolvedUrl.startsWith("http://") || resolvedUrl.startsWith("https://");
+  const credentials = init.credentials ?? (isCrossOrigin ? "include" : "same-origin");
+
+  const response = await fetch(input, { ...init, method, headers, credentials });
 
   if (!response.ok) {
     const errorData = await parseErrorBody(response, method);
