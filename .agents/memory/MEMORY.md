@@ -1,0 +1,2 @@
+- [Caller Tracking auth](caller-tracking-auth.md) — passwords use SHA256 (Node crypto), cookie-based JWT; admin=admin123, agent KyawG=agent123
+- [Caller Tracking DB](caller-tracking-db.md) — Supabase project vuywhhmwrqykukcemifd; ct_phone_numbers has called_count + last_called_at added via mgmt API
