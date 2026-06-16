@@ -47,11 +47,24 @@ Telemarketing agent tool — agents call customers one-by-one from an assigned p
 - **Agent Dashboard**: Shows one phone number at a time with a big tap-to-dial tel: link. Five large Myanmar-language outcome buttons. Submit → auto-load next number. Progress indicator.
 - **Admin Dashboard**: Per-agent call stats overview, agent management (create/deactivate/reset password), bulk phone number upload, per-agent call log detail with time-between-calls.
 
+## Deployment (Vercel)
+
+- Production URL: https://caller-tracking-system.vercel.app
+- GitHub: https://github.com/ccorryxx-bot/Caller-Tracking (push via `node scripts/src/github-push.mjs`)
+- Vercel project: `caller-tracking-system` (prj_go6QW6qogrrqyAMRNAzMee0rLOGi), team: novabett-s-projects
+- Build: `bash build-vercel.sh` — creates `.vercel/output/` (Build Output API v3)
+  - Static frontend → `.vercel/output/static/`
+  - Express API as serverless function → `.vercel/output/functions/api/[...path].func/`
+  - Routes: `/api/*` → serverless function, all else → `index.html` (SPA)
+- Required Vercel env vars: `SUPABASE_URL`, `SERVICE_ROLE`, `JWT_SECRET`
+- No Replit hosting needed — fully self-contained on Vercel + Supabase
+
 ## User preferences
 
 - Myanmar language UI throughout
 - Mobile-first layout (agent flow especially)
 - Push completed code to GitHub: https://github.com/ccorryxx-bot/Caller-Tracking
+- Prefer free hosting (Vercel for frontend + API, Supabase for DB) — no paid services
 
 ## Gotchas
 
@@ -59,6 +72,10 @@ Telemarketing agent tool — agents call customers one-by-one from an assigned p
 - After adding new route files to api-server, must restart workflow to rebuild (esbuild bundles on startup)
 - ct_phone_numbers.called_count and last_called_at columns were added manually via Supabase management API
 - ct_call_logs.phone_number_id was added as a nullable FK column
+- Vercel Build Output API: `.vercel/output/` must be created by buildCommand; api function must bundle pino worker files
+- `github-push.mjs` uses `git ls-files` (tracked) + `git ls-files --others --exclude-standard` (untracked) to catch new files
+- `build-vercel.sh` is untracked by git — included via the `--others` flag fix above
+- Vercel `framework: null` + custom buildCommand does NOT auto-detect `api/` functions — must use Build Output API
 
 ## Pointers
 

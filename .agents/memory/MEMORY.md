@@ -1,2 +1,4 @@
 - [Caller Tracking auth](caller-tracking-auth.md) — passwords use SHA256 (Node crypto), cookie-based JWT; admin=admin123, agent KyawG=agent123
 - [Caller Tracking DB](caller-tracking-db.md) — Supabase project vuywhhmwrqykukcemifd; ct_phone_numbers has called_count + last_called_at added via mgmt API
+- [Vercel Build Output API](vercel-build-output.md) — framework:null + custom buildCommand does NOT auto-detect api/ functions; must use .vercel/output/ Build Output API v3.
+- [GitHub push script gotchas](github-push-gotchas.md) — must include both tracked and untracked files; build-vercel.sh is untracked so needs --others flag in git ls-files.
