@@ -28,10 +28,17 @@ const api = async (endpoint, method = "GET", body) => {
   return r.json();
 };
 
-// Get all git-tracked files that exist on disk (skip deleted/untracked deletions)
-const files = execSync("git --no-optional-locks ls-files", { cwd: ROOT })
+// Get tracked files that exist on disk (skip deleted files)
+const trackedFiles = execSync("git --no-optional-locks ls-files", { cwd: ROOT })
   .toString().trim().split("\n").filter(Boolean)
   .filter((f) => fs.existsSync(path.join(ROOT, f)));
+
+// Get new untracked files (not gitignored)
+const untrackedFiles = execSync("git --no-optional-locks ls-files --others --exclude-standard", { cwd: ROOT })
+  .toString().trim().split("\n").filter(Boolean)
+  .filter((f) => fs.existsSync(path.join(ROOT, f)));
+
+const files = [...new Set([...trackedFiles, ...untrackedFiles])];
 
 console.log(`📁 ${files.length} files to push`);
 
