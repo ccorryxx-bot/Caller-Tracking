@@ -28,9 +28,10 @@ const api = async (endpoint, method = "GET", body) => {
   return r.json();
 };
 
-// Get all git-tracked files
+// Get all git-tracked files that exist on disk (skip deleted/untracked deletions)
 const files = execSync("git --no-optional-locks ls-files", { cwd: ROOT })
-  .toString().trim().split("\n").filter(Boolean);
+  .toString().trim().split("\n").filter(Boolean)
+  .filter((f) => fs.existsSync(path.join(ROOT, f)));
 
 console.log(`📁 ${files.length} files to push`);
 
