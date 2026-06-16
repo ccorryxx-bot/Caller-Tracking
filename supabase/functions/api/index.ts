@@ -3,7 +3,8 @@ import * as jose from "npm:jose@5";
 
 // ── Env ───────────────────────────────────────────────────────────────────────
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SERVICE_ROLE = Deno.env.get("SERVICE_ROLE")!;
+// Supabase auto-injects SUPABASE_SERVICE_ROLE_KEY into every Edge Function
+const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const JWT_SECRET_RAW = Deno.env.get("JWT_SECRET") ?? "caller-tracking-jwt-secret-2026";
 const COOKIE_NAME = "ct_session";
 const ALLOWED_ORIGIN = Deno.env.get("FRONTEND_URL") ?? "https://caller-tracking-system.vercel.app";
